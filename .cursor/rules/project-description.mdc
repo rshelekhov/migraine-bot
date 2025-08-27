@@ -1,0 +1,105 @@
+---
+alwaysApply: false
+---
+
+Migraine Telegram Bot — Project Documentation
+
+Project Overview
+
+The Migraine Telegram Bot is a patient self-monitoring tool designed to assist individuals with migraines and frequent headaches in tracking their symptoms, identifying triggers, and generating reports. It will initially operate as a Telegram bot written in Go, with a backend architecture designed to support future web and mobile applications.
+
+The bot will:
+• Collect user data on headache frequency, intensity, and potential triggers.
+• Support custom scheduling for reminders.
+• Provide statistics and reports over time.
+• Be modular and extensible to allow integration with future interfaces.
+• Store all data securely in PostgreSQL with encryption.
+• Support multiple languages (i18n).
+
+Target users include patients with chronic headaches, individuals undergoing treatment, and patients of healthcare institutions.
+
+⸻
+
+Architecture Plan
+
+Core Components 1. Bot Service
+• Handles communication with the Telegram Bot API.
+• Manages conversational flows (linear questionnaire at MVP stage).
+• Delegates business logic to use case layer. 2. Worker Service
+• Processes scheduled reminders and notifications.
+• Uses Redis + task queue for reliable job handling.
+• Supports timezone-aware scheduling. 3. Backend (Application Layer)
+• Implements use cases (symptom logging, scheduling, reporting).
+• Uses clean architecture principles with domain layer decoupled from controllers.
+• Provides an interface for future web or mobile frontends. 4. Database Layer
+• PostgreSQL as the primary database.
+• Pressly/goose for schema migrations.
+• Relational model with tables for users, entries, triggers, medications, and settings. 5. Monitoring and Logging
+• Structured logs with slog.
+• Prometheus metrics for performance and reliability.
+• Health-check endpoint for system status. 6. Security and Privacy
+• All sensitive data encrypted in storage.
+• Anonymous mode (users identified only by Telegram ID).
+• GDPR-friendly storage model. 7. Internationalization (i18n)
+• Language selection at onboarding (with fallback to Telegram’s language_code).
+• All texts stored in locale files (e.g., JSON/YAML) separate from code.
+• Support for multilingual scales and trigger descriptions.
+• preferred_language field in users table.
+• Default fallback: English.
+
+⸻
+
+Project Structure
+
+project/
+├── cmd/ # entry points (bot, worker, migrations)
+├── internal/
+│ ├── domain/ # core business logic (entities, interfaces)
+│ ├── usecase/ # application use cases
+│ ├── infrastructure/
+│ │ ├── db/ # PostgreSQL adapters
+│ │ ├── redis/ # Redis queue handlers
+│ │ ├── telegram/ # Telegram API integration
+│ │ └── i18n/ # localization support
+│ └── interface/ # controllers (bot handlers, API endpoints)
+├── migrations/ # goose migration files
+├── configs/ # configuration files
+└── locales/ # i18n dictionaries (JSON/YAML)
+
+⸻
+
+Roadmap
+
+MVP (Phase 1)
+• Telegram bot with linear questionnaire.
+• User registration and anonymous mode.
+• Configurable reminder scheduling (timezone-aware).
+• Symptom logging: intensity (0–10), duration, triggers.
+• Data storage in PostgreSQL.
+• Basic statistics: frequency and average intensity over week/month.
+• Logging, Prometheus metrics, health-check endpoint.
+• Initial i18n support (English + Russian).
+
+Phase 2 — Enhancements
+• Web dashboard for extended visualization.
+• Advanced statistics (heatmaps, correlations between triggers and pain).
+• Export data (CSV, PDF).
+• Multi-language support expansion.
+• User roles (patients/doctors).
+
+Phase 3 — Integration
+• Secure data sharing with clinicians.
+• Authentication system for web portal.
+• Push notifications beyond Telegram.
+• Aggregated anonymized datasets for research.
+
+Phase 4 — Scaling
+• Migration of statistics to specialized time-series DB (TimescaleDB or ClickHouse).
+• Distributed workers for large-scale reminders.
+• Advanced analytics and AI-assisted insights.
+
+⸻
+
+Summary
+
+The Migraine Telegram Bot is designed as a modular, secure, and extensible system with clean architecture. The initial MVP focuses on Telegram interaction, structured data storage, timezone-aware reminders, and multilingual support. Future iterations will expand into web applications, advanced analytics, and integrations with healthcare systems.
